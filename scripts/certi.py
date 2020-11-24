@@ -11,7 +11,7 @@ from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import Select
 import requests
-import json
+import json 
 
 # prefs = {"download.default_directory" : '/var/www/seleniumtest/archive/'}
 def get_source(html):
@@ -28,7 +28,7 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 options.add_argument("--silent")
 
 apiurl = "http://13.127.92.196:8000/cvakilapi/v1/company/"
-browser = webdriver.Chrome('/var/www/chromedriver', options=options)
+browser = webdriver.Chrome('/var/www/Python-projects/python-script/chromedriver', options=options)
 while True:
 	Cinlist = requests.get(url = apiurl+"?scrap_status=0&status=Active")
 	cin_list = json.loads(Cinlist.text)

@@ -1,6 +1,7 @@
 from selenium import webdriver 
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
+# from selenium.webdriver.common.by import Byfil
 import time 
 import csv
 from selenium.common.exceptions import TimeoutException
@@ -13,6 +14,7 @@ import cv2
 import numpy
 import json
 from bs4 import BeautifulSoup
+import pyautogui
 
 def get_source(html):
 	soup = BeautifulSoup(html,'html.parser')
@@ -52,13 +54,13 @@ options.add_argument('--ignore-ssl-errors')
 options.add_argument("--remote-debugging-port=9222")
 # options.add_experimental_option("prefs",prefs)
 # options.add_experimental_option("prefs", profile)
-options.add_experimental_option('prefs',  {
-	"download.default_directory": '/var/www/Python-projects/python-script/download/ipindiadocs/',
-	"download.prompt_for_download": False,
-	"download.directory_upgrade": True,
-	"plugins.always_open_pdf_externally": True
-	}
-)
+# options.add_experimental_option('prefs',  {
+# 	"download.default_directory": '/var/www/Python-projects/python-script/download/ipindiadocs/',
+# 	"download.prompt_for_download": False,
+# 	"download.directory_upgrade": True,
+# 	"plugins.always_open_pdf_externally": True
+# 	}
+# )
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 options.add_argument("--silent")
 
@@ -80,6 +82,7 @@ try:
 		trs = browser.find_elements_by_xpath("//table/tbody/tr/td[1]")
 		for i in trs:
 			i.click()
+			name = i.text
 			browser.switch_to.window(browser.window_handles[1])
 			soup = get_source(browser.page_source)
 			
@@ -135,6 +138,7 @@ try:
 			browser.find_element_by_name("submit").click()
 			time.sleep(5)
 			browser.switch_to.window(browser.window_handles[2])
+			time.sleep(3)
 			soup = get_source(browser.page_source)
 			app_data = soup.find(id='Content').table.tbody.find_all('tr')
 			detail_key = []
@@ -155,17 +159,30 @@ try:
 			new3_detail_data = {detail_key:detail_value for detail_key, detail_value in new2_detail_data.items() if detail_key != 'TITLE OF INVENTION'}
 			new_detail_data = {detail_key:detail_value for detail_key, detail_value in new3_detail_data.items() if detail_key != 'FIELD OF INVENTION'} 
 			total_data = dict(list(all_data.items()) + list(new_detail_data.items()))
-			with open(".json", "w") as outfile: 
+
+			with open("%s.json" % name, "w") as outfile: 
 				json.dump(total_data, outfile)
 			browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 			browser.find_element_by_name("SubmitAction").click()
 			time.sleep(5)
 
 			btns = browser.find_elements_by_name("DocumentName")
-			print(btns)
-
+			v=1
 			for btn in btns:
+				
 				btn.click()
+				browser.switch_to.window(browser.window_handles[3])
+				time.sleep(3)
+				print("saving")
+				pyautogui.hotkey('ctrl','s')
+				time.sleep(4)
+				path = '/var/www/Python-projects/python-script/download/ipindiadocs/'
+				pyautogui.write(path+ name +'_'+str(v))
+				time.sleep(3)
+				pyautogui.press('enter')
+				v+=1
+				browser.close()
+				browser.switch_to.window(browser.window_handles[2])
 				time.sleep(5)
 			browser.close()
 			browser.switch_to.window(browser.window_handles[1])
