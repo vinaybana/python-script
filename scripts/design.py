@@ -15,6 +15,14 @@ import numpy as np
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
+import json
+import urllib
+import urllib.request
+
+def get_source(html):
+    soup = BeautifulSoup(html,'html.parser')
+    return soup
 
 def getDetail(browser,img_name):
     browser.find_element_by_xpath("//select[@name='ddlsearchoptioncell0']/option[text()='DATE OF FILING']").click()
@@ -46,22 +54,15 @@ def getDetail(browser,img_name):
     text.send_keys(cap_text)
     time.sleep(5)
     # browser.find_element_by_class_name('pull-left').click()
-    browser.find_element_by_xpath("//input[@value='Get Search']").click() 
-    time.sleep(5)
-    try:
-        time.sleep(5)
-        print('hiiiiiiiiiiiii')
-        total = browser.find_element_by_xpath("//div[@id='hidemeForDisplayChallan']/section/div/div[@class='row']").text
-        # total = browser.findElement(By.partialLinkText ("Page 1 of")).text;
-        print(total)
-        # a=browser.find_element_by_class_name("pagination-container")
-        # total = browser.find_element_by_partial_link_text("Page 1 of").text
-        print("tryyyyyy")
-        # return a
-
-    except Exception as e:
-        print(e)
+    # browser.find_element_by_xpath("//input[@value='Get Search']").click() 
+    # time.sleep(15)
+    total = browser.find_elements_by_class_name("sm")
+    if len(total) == 0:
         getDetail(browser,img_name)
+    else:
+        # print(total)
+        pass
+        
     # return cap_text
 
 options = Options()         
@@ -77,8 +78,70 @@ browser = webdriver.Chrome('/var/www/Python-projects/python-script/chromedriver'
 browser.get('https://ipindiaservices.gov.in/designsearch/')
 time.sleep(3)
 getDetail(browser, "captcha.png")
-time.sleep(5)
-# total = browser.find_element_by_xpath("//div[contains(text(), 'Total Document(s):')]").text
-total = browser.find_element_by_xpath("//div[@id='hidemeForDisplayChallan']/section/div/div/ul/li[1]/a").text
-# total = browser.find_element_by_partial_link_text("Page 1 of").text
-print(total)
+
+# total = browser.find_elements_by_class_name("sm")
+pages = browser.find_element_by_xpath("//div[@class='pagination-container']/ul/li[1]/a").text
+pagination = pages.split(' ')[3][:-1]
+print(pagination)
+for page in pagination:
+    sms = browser.find_elements_by_xpath("//div[@class='sm']/a")
+    for sm in sms: 
+        name = sm.text
+        path = '/var/www/Python-projects/python-script/download/design/'
+        print(sm.text)
+        sm.click()
+        time.sleep(4)
+        soup = get_source(browser.page_source)
+        get_data = soup.find("div", {"class": "modal-body"}).findAll("div",{"class":"row"})
+        key = []
+        value = []
+        for data in get_data:
+            # a = data.find_all("div",{"class":"col-lg-4"}).text.strip()
+            # print('a', a)
+            try:
+                key.append(data.find("div",{"class":"col-lg-4"}).text.strip())
+                value.append(data.find("div",{"class":"col-lg-8"}).text.strip())
+            except Exception as e:
+                pass
+
+            all_data = dict(zip(key, value))
+            tables = soup.find('table',{"class": "table-striped"})
+            applicant_data = []
+            applicant = {}
+            applicant_key = {}
+            for table in tables.tbody.find_all('tr'):
+                applicant_key['Name']=table.find_all('td')[1].text.strip()
+                applicant_key['Address']=table.find_all('td')[2].text.strip()
+                applicant_data.append(applicant_key)
+            all_data['Applicant'] = applicant_data
+            priority_data = []
+            priority = {}
+            priority_key = {}
+            try:
+                priroitytable = soup.find(id="tblPCTPriority")
+                priority_key['Number']=priroitytable.find('td')[1].text.strip()
+                priority_key['Name']=priroitytable.find('td')[2].text.strip()
+                priority_key['Date']=priroitytable.find('td')[3].text.strip()
+                priority_data.append(priority_key)
+            except:
+                priority_data = 'Record Not Found !'
+            all_data['Priority'] = priority_data
+
+            # cap_img = browser.find_element_by_class_name('img-responsive').screenshot_as_png
+            cap_img = browser.find_elements_by_class_name('img-responsive')[1].screenshot_as_png
+            # print(cap_img)
+            # for img in cap_img:
+            #     print(img.get_attribute('src'))
+            # src = cap_img[1].get_attribute('src')
+            # print(src)
+            # urllib.request.urlretrieve(src, "../download/design/" + name+".png")
+            # imageStream = io.BytesIO(cap_img)
+            # im = Image.open(imageStream)
+            # im.save(path+'/'+name,'png')
+
+            with open("%s.json" % name, "w") as outfile: 
+                json.dump(all_data, outfile)
+        
+        print(all_data)
+        browser.find_element_by_class_name("btn-warning").click()
+    browser.find_element_by_xpath("//li[@class='PagedList-skipToNext']/a").click()
