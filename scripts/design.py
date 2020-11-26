@@ -18,19 +18,17 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def getDetail(browser,img_name):
     browser.find_element_by_xpath("//select[@name='ddlsearchoptioncell0']/option[text()='DATE OF FILING']").click()
-    time.sleep(2)
+    time.sleep(1)
     browser.find_element_by_xpath("//select[@name='ddltypeofserch0']/option[text()='Greater Than']").click()
-    time.sleep(2)
+    time.sleep(1)
     browser.find_element_by_id("textfieldnumbersnew0").send_keys('01/01/2020')
-    time.sleep(2)
-    browser.find_element_by_xpath("//select[@name='ddlandor0']/option[text()='AND']").click()
-    time.sleep(2)
+    time.sleep(1)
     browser.find_element_by_xpath("//select[@name='ddlsearchoptioncell1']/option[text()='DATE OF FILING']").click()
-    time.sleep(2)
+    time.sleep(1)
     browser.find_element_by_xpath("//select[@name='ddltypeofserch1']/option[text()='Less Than']").click()
-    time.sleep(2)
+    time.sleep(1)
     browser.find_element_by_id("textfieldnumbersnew1").send_keys('01/01/2021')
-    time.sleep(2)
+    time.sleep(1)
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     cap_img = browser.find_element_by_id('Captcha').screenshot_as_png
     imageStream = io.BytesIO(cap_img)
@@ -51,13 +49,9 @@ def getDetail(browser,img_name):
     browser.find_element_by_xpath("//input[@value='Get Search']").click() 
     time.sleep(5)
     try:
-        # WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS, "card")))
-        # WebDriverWait(browser, 600).until(EC.presence_of_element_located(By.XPATH("//div[id='hidemeForDisplayChallan']/section/div/div/h4[text()='Design Search Utility']")));
-        # Wait.until(EC.textToBePresentInElement(h4, "Design Search Utility"));
-        # time.sleep(600)
         time.sleep(5)
         print('hiiiiiiiiiiiii')
-        total = browser.find_element_by_xpath("//div[@id='hidemeForDisplayChallan']/section/div/div/ul/li/a[@text()='Page 1 of']").text
+        total = browser.find_element_by_xpath("//div[@id='hidemeForDisplayChallan']/section/div/div[@class='row']").text
         # total = browser.findElement(By.partialLinkText ("Page 1 of")).text;
         print(total)
         # a=browser.find_element_by_class_name("pagination-container")
@@ -85,6 +79,6 @@ time.sleep(3)
 getDetail(browser, "captcha.png")
 time.sleep(5)
 # total = browser.find_element_by_xpath("//div[contains(text(), 'Total Document(s):')]").text
-total = browser.findElement(By.partialLinkText ("Page 1 of")).text;
+total = browser.find_element_by_xpath("//div[@id='hidemeForDisplayChallan']/section/div/div/ul/li[1]/a").text
 # total = browser.find_element_by_partial_link_text("Page 1 of").text
 print(total)
