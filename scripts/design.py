@@ -53,17 +53,11 @@ def getDetail(browser,img_name):
     text.clear()
     text.send_keys(cap_text)
     time.sleep(5)
-    # browser.find_element_by_class_name('pull-left').click()
-    # browser.find_element_by_xpath("//input[@value='Get Search']").click() 
-    # time.sleep(15)
     total = browser.find_elements_by_class_name("sm")
     if len(total) == 0:
         getDetail(browser,img_name)
     else:
-        # print(total)
         pass
-        
-    # return cap_text
 
 options = Options()         
 options.add_argument("--start-maximized")
@@ -79,7 +73,6 @@ browser.get('https://ipindiaservices.gov.in/designsearch/')
 time.sleep(3)
 getDetail(browser, "captcha.png")
 
-# total = browser.find_elements_by_class_name("sm")
 pages = browser.find_element_by_xpath("//div[@class='pagination-container']/ul/li[1]/a").text
 pagination = pages.split(' ')[3][:-1]
 print(pagination)
@@ -96,8 +89,6 @@ for page in pagination:
         key = []
         value = []
         for data in get_data:
-            # a = data.find_all("div",{"class":"col-lg-4"}).text.strip()
-            # print('a', a)
             try:
                 key.append(data.find("div",{"class":"col-lg-4"}).text.strip())
                 value.append(data.find("div",{"class":"col-lg-8"}).text.strip())
@@ -128,7 +119,10 @@ for page in pagination:
             all_data['Priority'] = priority_data
 
             # cap_img = browser.find_element_by_class_name('img-responsive').screenshot_as_png
-            cap_img = browser.find_elements_by_class_name('img-responsive')[1].screenshot_as_png
+            # cap_img = browser.find_elements_by_class_name('img-responsive')[1].screenshot_as_png
+            img = browser.find_element_by_xpath("//div[@id='divApplicationDetail']/section/div/div[2]/div/img")
+            src = img.get_attribute('src')
+            urllib.request.urlretrieve(src, '/var/www/Python-projects/python-script/download/design/'+name+".png")
             # print(cap_img)
             # for img in cap_img:
             #     print(img.get_attribute('src'))
@@ -138,6 +132,7 @@ for page in pagination:
             # imageStream = io.BytesIO(cap_img)
             # im = Image.open(imageStream)
             # im.save(path+'/'+name,'png')
+            all_data['Image'] = '/var/www/Python-projects/python-script/download/design/'+name+".png"
 
             with open("%s.json" % name, "w") as outfile: 
                 json.dump(all_data, outfile)
