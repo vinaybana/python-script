@@ -15,6 +15,7 @@ import numpy
 import json
 from bs4 import BeautifulSoup
 import pyautogui
+import os, sys
 
 def get_source(html):
 	soup = BeautifulSoup(html,'html.parser')
@@ -83,6 +84,7 @@ try:
 		for i in trs:
 			i.click()
 			name = i.text
+			cwd = os.getcwd()
 			browser.switch_to.window(browser.window_handles[1])
 			soup = get_source(browser.page_source)
 			
@@ -104,23 +106,27 @@ try:
 			tables = soup.find('table',{"class": "table-striped"}).find_all('table',{"class": "table-striped"})
 			inventory_data = []
 			inventory = {}
-			inventory_key = {}
+			# inventory_key = {}
 			for table in tables[0].tbody.find_all('tr')[1:]:
+				inventory_key = {}
 				inventory_key['Name'] = table.find_all('td')[0].text
 				inventory_key['Address'] = table.find_all('td')[1].text
 				inventory_key['Country'] = table.find_all('td')[2].text
 				inventory_key['Nationality'] = table.find_all('td')[3].text
 				inventory_data.append(inventory_key)
+			# print(inventory_data)
 			all_data['Inventory'] = inventory_data
 			applicant_data = []
 			applicant = {}
-			applicant_key = {}
+			
 			for table in tables[1].tbody.find_all('tr')[1:]:
+				applicant_key = {}
 				applicant_key['Name'] = table.find_all('td')[0].text
 				applicant_key['Address'] = table.find_all('td')[1].text
 				applicant_key['Country'] = table.find_all('td')[2].text
 				applicant_key['Nationality'] = table.find_all('td')[3].text
 				applicant_data.append(applicant_key)
+			# print(applicant_data)
 			all_data['Applicant'] = applicant_data
 			for data in get_data:
 				try:
@@ -134,6 +140,10 @@ try:
 						all_data['Complete Specification'] = data.find_all('td')[0].text.strip()
 				except Exception as e:
 					continue
+
+			# print(all_data)
+
+
 			browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 			browser.find_element_by_name("submit").click()
 			time.sleep(5)
@@ -159,9 +169,13 @@ try:
 			new3_detail_data = {detail_key:detail_value for detail_key, detail_value in new2_detail_data.items() if detail_key != 'TITLE OF INVENTION'}
 			new_detail_data = {detail_key:detail_value for detail_key, detail_value in new3_detail_data.items() if detail_key != 'FIELD OF INVENTION'} 
 			total_data = dict(list(all_data.items()) + list(new_detail_data.items()))
+			print(total_data)
+			# with open("%s.json" % name, "w") as outfile: 
+			# 	json.dump(total_data, outfile)
+			newpath = cwd+"/patentsearch/"
+			outfile = open("{0}.json".format(newpath+name),'w')
+			json.dump(all_data,outfile)
 
-			with open("%s.json" % name, "w") as outfile: 
-				json.dump(total_data, outfile)
 			browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 			browser.find_element_by_name("SubmitAction").click()
 			time.sleep(5)
@@ -169,21 +183,26 @@ try:
 			btns = browser.find_elements_by_name("DocumentName")
 			v=1
 			for btn in btns:
-				
-				btn.click()
-				browser.switch_to.window(browser.window_handles[3])
-				time.sleep(3)
-				print("saving")
-				pyautogui.hotkey('ctrl','s')
-				time.sleep(4)
-				path = '/var/www/Python-projects/python-script/download/ipindiadocs/'
-				pyautogui.write(path+ name +'_'+str(v))
-				time.sleep(3)
-				pyautogui.press('enter')
-				v+=1
-				browser.close()
-				browser.switch_to.window(browser.window_handles[2])
-				time.sleep(5)
+				# print(btn.text)
+				jpg = btn.text.split('.')[1]
+				if jpg == 'jpg':
+					btn.click()
+				else:
+					btn.click()
+					browser.switch_to.window(browser.window_handles[3])
+					time.sleep(3)
+					print("saving")
+					pyautogui.hotkey('ctrl','s')
+					time.sleep(4)
+					newpath = cwd+"/patentpdf/"
+					# path = '/var/www/Python-projects/python-script/download/ipindiadocs/'
+					pyautogui.write(newpath+ name +'_'+str(v))
+					time.sleep(3)
+					pyautogui.press('enter')
+					v+=1
+					browser.close()
+					browser.switch_to.window(browser.window_handles[2])
+					time.sleep(5)
 			browser.close()
 			browser.switch_to.window(browser.window_handles[1])
 			browser.close()

@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 import json
 import urllib
 import urllib.request
+import os, sys
 
 def get_source(html):
     soup = BeautifulSoup(html,'html.parser')
@@ -80,6 +81,7 @@ for page in pagination:
     sms = browser.find_elements_by_xpath("//div[@class='sm']/a")
     for sm in sms: 
         name = sm.text
+        cwd = os.getcwd()
         path = '/var/www/Python-projects/python-script/download/design/'
         print(sm.text)
         sm.click()
@@ -118,24 +120,17 @@ for page in pagination:
                 priority_data = 'Record Not Found !'
             all_data['Priority'] = priority_data
 
-            # cap_img = browser.find_element_by_class_name('img-responsive').screenshot_as_png
-            # cap_img = browser.find_elements_by_class_name('img-responsive')[1].screenshot_as_png
             img = browser.find_element_by_xpath("//div[@id='divApplicationDetail']/section/div/div[2]/div/img")
             src = img.get_attribute('src')
-            urllib.request.urlretrieve(src, '/var/www/Python-projects/python-script/download/design/'+name+".png")
-            # print(cap_img)
-            # for img in cap_img:
-            #     print(img.get_attribute('src'))
-            # src = cap_img[1].get_attribute('src')
-            # print(src)
-            # urllib.request.urlretrieve(src, "../download/design/" + name+".png")
-            # imageStream = io.BytesIO(cap_img)
-            # im = Image.open(imageStream)
-            # im.save(path+'/'+name,'png')
-            all_data['Image'] = '/var/www/Python-projects/python-script/download/design/'+name+".png"
+            newpath = cwd+"/designimg/"
+            newpath2 = cwd+"/designjson/"
+            urllib.request.urlretrieve(src, newpath+name+".png")
+            all_data['Image'] = newpath+name+".png"
 
-            with open("%s.json" % name, "w") as outfile: 
-                json.dump(all_data, outfile)
+            # with open("%s.json" % newpath+name  , "w") as outfile: 
+            #     json.dump(all_data, outfile)
+            outfile = open("{0}.json".format(newpath2+name),'w')
+            json.dump(all_data,outfile)
         
         print(all_data)
         browser.find_element_by_class_name("btn-warning").click()
