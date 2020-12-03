@@ -45,12 +45,9 @@ def getDetail(browser,img_name):
 	except Exception as e:
 		getDetail(browser,img_name)
 
-
-
-
-# download_dir = {"download.default_directory" : new}
+# download_dir = {"download.default_directory" : '/var/www/Python-projects/python-script/download/ipindiadocs/'}
 # profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
-# 			   "download.default_directory": new, "download.extensions_to_open": "applications/pdf"}
+			   # "download.default_directory": '/var/www/Python-projects/python-script/download/ipindiadocs/', "download.extensions_to_open": "applications/pdf"}
 options = Options()			
 options.add_argument("--start-maximized")
 options.add_argument('--ignore-certificate-errors')
@@ -75,7 +72,7 @@ startingdate.send_keys('01/01/1800')
 enddate = browser.find_element_by_id("ToDate")
 enddate.send_keys('12/29/2020')
 getDetail(browser,'captcha.png')
-time.sleep(3)
+
 a =	browser.find_element_by_xpath("//p[contains(text(), 'Total Document(s):')]").text
 total_count = a.split(' ')[2]
 rows = len(browser.find_elements_by_xpath("//table/tbody/tr"))
@@ -172,7 +169,12 @@ try:
 			new3_detail_data = {detail_key:detail_value for detail_key, detail_value in new2_detail_data.items() if detail_key != 'TITLE OF INVENTION'}
 			new_detail_data = {detail_key:detail_value for detail_key, detail_value in new3_detail_data.items() if detail_key != 'FIELD OF INVENTION'} 
 			total_data = dict(list(all_data.items()) + list(new_detail_data.items()))
-			
+			print(total_data)
+			# with open("%s.json" % name, "w") as outfile: 
+			# 	json.dump(total_data, outfile)
+			newpath = cwd+"/patentsearch/"
+			outfile = open("{0}.json".format(newpath+name),'w')
+			json.dump(all_data,outfile)
 
 			browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 			browser.find_element_by_name("SubmitAction").click()
@@ -180,21 +182,27 @@ try:
 
 			btns = browser.find_elements_by_name("DocumentName")
 			v=1
-			document_data = []
-			document = {}
 			for btn in btns:
-				docname = btn.text
-				docdate = btn.text.split(' [')[1].split('(')[0]
-				document_key = {}
-				document_key['Document'] = docname
-				document_key['Date'] = docdate
-				document_data.append(document_key)
-				v+=1
-			total_data['Documents'] = document_data
-			print(total_data)
-			newpath = cwd+"/ipindiadocs/"
-			outfile = open("{0}.json".format(newpath+name),'w')
-			json.dump(total_data,outfile)
+				# print(btn.text)
+				jpg = btn.text.split('.')[1]
+				if jpg == 'jpg':
+					btn.click()
+				else:
+					btn.click()
+					browser.switch_to.window(browser.window_handles[3])
+					time.sleep(3)
+					print("saving")
+					pyautogui.hotkey('ctrl','s')
+					time.sleep(4)
+					newpath = cwd+"/patentpdf/"
+					# path = '/var/www/Python-projects/python-script/download/ipindiadocs/'
+					pyautogui.write(newpath+ name +'_'+str(v))
+					time.sleep(3)
+					pyautogui.press('enter')
+					v+=1
+					browser.close()
+					browser.switch_to.window(browser.window_handles[2])
+					time.sleep(5)
 			browser.close()
 			browser.switch_to.window(browser.window_handles[1])
 			browser.close()

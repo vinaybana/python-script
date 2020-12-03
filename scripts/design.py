@@ -67,6 +67,7 @@ options.add_argument('--ignore-ssl-errors')
 options.add_argument("--remote-debugging-port=9222")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 options.add_argument("--silent")
+options.add_argument("--headless")
 
 browser = webdriver.Chrome('/var/www/Python-projects/python-script/chromedriver', options=options)
 
@@ -122,6 +123,7 @@ for page in pagination:
 
             img = browser.find_element_by_xpath("//div[@id='divApplicationDetail']/section/div/div[2]/div/img")
             src = img.get_attribute('src')
+            time.sleep(3)
             newpath = cwd+"/designimg/"
             newpath2 = cwd+"/designjson/"
             urllib.request.urlretrieve(src, newpath+name+".png")
