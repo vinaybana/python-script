@@ -44,9 +44,9 @@ def getDetail(browser,img_name):
 		browser.find_element_by_name('submit').click()
 	except:
 		return cap_text
-	time.sleep(5)
+	time.sleep(3)
 	try:
-		time.sleep(5)
+		time.sleep(3)
 		browser.find_element_by_id('tableData')
 	except Exception as e:
 		getDetail(browser,img_name)
@@ -56,12 +56,12 @@ def DataProcess():
 	while True:
 		param = que.get()
 		options = Options()			
-		options.add_argument("--start-maximized")
-		options.add_argument('--ignore-certificate-errors')
-		options.add_argument('--ignore-ssl-errors')
-		options.add_argument("--remote-debugging-port=9222")
-		options.add_experimental_option('excludeSwitches', ['enable-logging'])
-		options.add_argument("--silent")
+		# options.add_argument("--start-maximized")
+		# options.add_argument('--ignore-certificate-errors')
+		# options.add_argument('--ignore-ssl-errors')
+		# options.add_argument("--remote-debugging-port=9222")
+		# options.add_experimental_option('excludeSwitches', ['enable-logging'])
+		# options.add_argument("--silent")
 		browser = webdriver.Chrome('/var/www/Python-projects/python-script/chromedriver', options=options)
 		browser.get('https://ipindiaservices.gov.in/PublicSearch')
 		startingdate = browser.find_element_by_id("FromDate")

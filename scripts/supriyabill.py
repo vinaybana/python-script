@@ -1,21 +1,28 @@
-units = int(input(" Please enter Number of Units you Consumed : "))
-totalslab = int(input(" Please enter Total Number of slab : "))            #asking total categories
+units = float(input(" Please enter Number of Units you Consumed : "))
+totalslab = int(input(" Please enter Total Number of slab : "))         #asking total categories
+slab=[]
+rate=[]
 totalvalue=[]
-am=0
 us=0
-for i,k in enumerate(range(1,totalslab+1)):    
-    if i< (totalslab-1):    
-        unitslab = int(input(" Please enter Number" +str(k)+  "Unit slab: " ))
-        tarrifslab = int(input(" Please enter Number" +str(k) + "Tarrif slab rate: " ))
-        us=unitslab+us
-        amount = (unitslab * tarrifslab)
-        am=amount+am
-        totalvalue.append(amount)
-    if i==(totalslab-1):
-        tarrifslab = int(input(" Please enter Number" +str(k) + "Tarrif slab rate: " ))
-        unit = (units-us)*tarrifslab
-        totalvalue.append(unit)
-x=0
-for i in totalvalue:    
-    x=x+i
-print(x)
+for i in range(totalslab-1):
+    unitslab = float(input(" Please enter Number" +str(i+1)+  "Unit slab: " ))
+    slab.append(unitslab)
+for i in range(totalslab):
+    tarrifslab = float(input(" Please enter Number" +str(i+1) + "Tarrif slab rate: " ))
+    rate.append(tarrifslab) 
+if units<slab[0]:
+    amount=units*rate[0]
+    print(amount)
+else:
+    for i in range(len(rate)):
+        if i< totalslab-1:
+            us=slab[i]+us
+            amount = (slab[i]) * (rate[i])
+            totalvalue.append(amount)
+        if i==totalslab-1:
+            unit = (units-us)*(rate[totalslab-1])
+            totalvalue.append(unit)
+    x=0
+    for i in totalvalue:    
+        x=x+i
+    print(x)
