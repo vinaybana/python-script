@@ -47,20 +47,25 @@ for doc in docs:
 		act_parts=browser.find_elements_by_xpath("//div[@class='container']/ul/li")
 		for part in act_parts:
 			part_name=part.text
-			print(part_name)
 			# part_name.click()
 			if part_name=='Sections':
 				soup1 = get_source(browser.page_source)
-				get_data = soup1.find(id='myTableActSection_wrapper').table.tbody.find_all('tr')				
+				get_data = soup1.find(id='myTableActSection_wrapper').table.tbody.find_all('tr')
+				i=1				
 				for data in get_data:
+					print(i)
 					sec_name=data.find('td').div.a.span.text
 					title=data.find('td').div.a.text.split('.')[1]
 					browser.find_element_by_class_name("secbtn").click()
 					# des=data.find('td').find('p').text
 					time.sleep(2)
-					des = browser.find_element_by_xpath("//div[@class='panel-body']/p")
-					print(des.text.strip())
+					# des = browser.find_element_by_xpath("//div[@class='panel-body']/p")
+					# des = browser.find_element_by_id('accordion'+str(i))
+					soup2 = get_source(browser.page_source)
+					des=soup2.find(id='accordion'+str(i)).div.div.find('p')
+					print(des.text)
 					print(des)
+					i+=1
 
 					
 					# print(data.find('td').div.div.div.text.strip())
