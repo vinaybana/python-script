@@ -37,3 +37,4 @@ for data in get_data:
 		section['detail']=section_soup
 		sec.append(section)
 	result['section']=sec
+	print(result)
