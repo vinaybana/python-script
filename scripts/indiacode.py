@@ -23,6 +23,8 @@ for data in get_data:
 	rules=[]
 	notifications=[]
 	regulations=[]
+	orders=[]
+	circulars=[]
 	for s in sections:
 		section={}
 		section_text=s.text.strip()
@@ -80,6 +82,34 @@ for data in get_data:
 				regulation['pdf_href']=pdf_href
 				regulations.append(regulation)
 			section['Regulations']=regulations
+		except:
+			pass
+		try:
+			docs=doc_soup.find(id='Orders'+section_id+'').table.tbody.find_all('tr')
+			for doc in docs:
+				order={}
+				year=doc.find_all('td')[0].text
+				description=doc.find_all('td')[1].text
+				pdf_href=doc.find_all('td')[2].a['href']
+				order['year']=year
+				order['description']=description
+				order['pdf_href']=pdf_href
+				orders.append(order)
+			section['Orders']=orders
+		except:
+			pass
+		try:
+			docs=doc_soup.find(id='circular'+section_id+'').table.tbody.find_all('tr')
+			for doc in docs:
+				circular={}
+				year=doc.find_all('td')[0].text
+				description=doc.find_all('td')[1].text
+				pdf_href=doc.find_all('td')[2].a['href']
+				circular['year']=year
+				circular['description']=description
+				circular['pdf_href']=pdf_href
+				circulars.append(circular)
+			section['Circulars']=circulars
 		except:
 			pass
 		sec.append(section)
