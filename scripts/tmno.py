@@ -1,7 +1,7 @@
 import requests
 import time 
 
-for i in range(232261, 4500100):
+for i in range(241148, 4500100):
 	print(i)
 	data = {
 			'tmno': i,

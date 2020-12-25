@@ -20,6 +20,9 @@ for data in get_data:
 	result['act_name']=act_name
 	sections=act_href_soup.find(id='myTableActSection').find_all('a','title')
 	sec = []
+	rules=[]
+	notifications=[]
+	regulations=[]
 	for s in sections:
 		section={}
 		section_text=s.text.strip()
@@ -35,6 +38,50 @@ for data in get_data:
 		section['name']=section_name
 		section['title']=section_title
 		section['detail']=section_soup
+		doc_req=requests.get('https://www.indiacode.nic.in/sectionlink?actid='+act_id+'&sectionID='+section_id)
+		doc_soup=get_source(doc_req.content)
+		try:
+			docs=doc_soup.find(id='Rules'+section_id+'').table.tbody.find_all('tr')
+			for doc in docs:
+				rule={}
+				year=doc.find_all('td')[0].text
+				description=doc.find_all('td')[1].text
+				pdf_href=doc.find_all('td')[2].a['href']
+				rule['year']=year
+				rule['description']=description
+				rule['pdf_href']=pdf_href
+				rules.append(rule)
+			section['Rule']=rules
+		except:
+			pass
+		try:
+			docs=doc_soup.find(id='Notifications'+section_id+'').table.tbody.find_all('tr')
+			for doc in docs:
+				notification={}
+				year=doc.find_all('td')[0].text
+				description=doc.find_all('td')[1].text
+				pdf_href=doc.find_all('td')[2].a['href']
+				notification['year']=year
+				notification['description']=description
+				notification['pdf_href']=pdf_href
+				notifications.append(notification)
+			section['Notifications']=notifications
+		except:
+			pass
+		try:
+			docs=doc_soup.find(id='Regulations'+section_id+'').table.tbody.find_all('tr')
+			for doc in docs:
+				regulation={}
+				year=doc.find_all('td')[0].text
+				description=doc.find_all('td')[1].text
+				pdf_href=doc.find_all('td')[2].a['href']
+				regulation['year']=year
+				regulation['description']=description
+				regulation['pdf_href']=pdf_href
+				regulations.append(regulation)
+			section['Regulations']=regulations
+		except:
+			pass
 		sec.append(section)
 	result['section']=sec
 	print(result)
