@@ -3,7 +3,6 @@ import time
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, quote_plus
 
-
 def get_source(html):
 	soup = BeautifulSoup(html,'html.parser')
 	return soup
